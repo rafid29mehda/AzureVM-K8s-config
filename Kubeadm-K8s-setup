@@ -1,0 +1,61 @@
+Sure, I'll provide you with a step-by-step guide to set up Kubernetes using `kubeadm` on an Ubuntu VM. This is a simplified guide, and it's recommended to check the official Kubernetes documentation for the latest information.
+
+### Step 1: Update System Packages
+```bash
+sudo apt update
+sudo apt upgrade -y
+```
+
+### Step 2: Install Docker
+```bash
+sudo apt install docker.io -y
+sudo systemctl start docker
+sudo systemctl enable docker
+```
+
+### Step 3: Install kubeadm, kubelet, and kubectl
+```bash
+sudo apt-get update && sudo apt-get install -y apt-transport-https curl
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+```
+
+### Step 4: Disable Swap
+Kubernetes requires disabling swap on your machine. Edit the `/etc/fstab` file and comment out the swap entry.
+
+### Step 5: Initialize Kubernetes Master Node
+```bash
+sudo kubeadm init --pod-network-cidr=192.168.0.0/16
+```
+
+### Step 6: Set Up kubeconfig for User
+```bash
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
+
+### Step 7: Install a Pod Network (e.g., Calico)
+```bash
+kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+```
+
+### Step 8: Join Worker Nodes (if applicable)
+If you have additional worker nodes, use the join command displayed after initializing the master on each worker node.
+
+### Step 9: Verify Nodes
+```bash
+kubectl get nodes
+```
+
+### Step 10: Deploy Applications
+Now, you can deploy your applications using `kubectl`.
+
+**Confidence Level:** Moderate
+
+**Note:** This is a basic guide, and the commands may change based on the Kubernetes and Ubuntu versions. Always refer to the official documentation for the most accurate and up-to-date information.
+
+For additional details or troubleshooting, you can refer to the official Kubernetes documentation: [Installing kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/).
